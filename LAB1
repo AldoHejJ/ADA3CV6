@@ -1,12 +1,39 @@
-def removeDuplicates(nums):
-    if not nums:
-        return 0
-    
-    k = 0
-    for i in range(1, len(nums)):
-        if nums[i] != nums[k]:
-            k += 1
-            nums[k] = nums[i]
-    
-    return k + 1
+#include <stdio.h>
 
+int removeDuplicates(int* nums, int numsSize) {
+    if (numsSize == 0) {
+        return 0;
+    }
+
+    int k = 0; // Índice para los elementos únicos
+    
+    for (int i = 1; i < numsSize; i++) {
+        if (nums[i] != nums[k]) {
+            k++;
+            nums[k] = nums[i];
+        }
+    }
+    
+    return k + 1; // k es el índice del último elemento único, por lo tanto k + 1 es el conteo de elementos únicos
+}
+
+// Función para imprimir el arreglo (opcional)
+void printArray(int* nums, int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", nums[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int nums[] = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4};
+    int numsSize = sizeof(nums) / sizeof(nums[0]);
+
+    int k = removeDuplicates(nums, numsSize);
+
+    printf("Número de elementos únicos: %d\n", k);
+    printf("Arreglo después de eliminar duplicados: ");
+    printArray(nums, k);
+
+    return 0;
+}
