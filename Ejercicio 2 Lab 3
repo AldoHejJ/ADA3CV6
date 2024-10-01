@@ -1,0 +1,30 @@
+#include <stdio.h>
+
+// Función recursiva para calcular el número de Fibonacci
+unsigned long long fibonacci(int n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+int main() {
+    int n = 0;
+    unsigned long long result;
+
+    // Encontrar hasta qué valor de n funciona la fórmula
+    while (1) {
+        result = fibonacci(n);
+        printf("Fibonacci(%d) = %llu\n", n, result);
+        n++;
+
+        // Verificar si el resultado está a punto de desbordar
+        if (result > 0xFFFFFFFFFFFFFFFFULL) {
+            printf("El valor de n = %d provoca un desbordamiento.\n", n);
+            break;
+        }
+    }
+
+    printf("El valor máximo de n que se puede calcular sin desbordamiento es: %d\n", n - 1);
+    return 0;
+}
