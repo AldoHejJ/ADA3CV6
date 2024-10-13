@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+typedef struct {
+    double x;
+    double y;
+} Point;
+
+// Estructura para almacenar información de la distancia mínima
+typedef struct {
+    double distance;
+    Point p1;
+    Point p2;
+} ClosestPair;
+
+// Comparador para ordenar puntos por coordenada x
+int compareX(const void* a, const void* b) {
+    Point* p1 = (Point*)a;
+    Point* p2 = (Point*)b;
+    return (p1->x > p2->x) - (p1->x < p2->x);
+}
+
+// Comparador para ordenar puntos por coordenada y
+int compareY(const void* a, const void* b) {
+    Point* p1 = (Point*)a;
+    Point* p2 = (Point*)b;
+    return (p1->y > p2->y) - (p1->y < p2->y);
+}
+
+// Función para calcular la distancia euclidiana
+double euclideanDistance(Point p1, Point p2) {
+    return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+}
+
+// Función para encontrar la distancia más corta en un conjunto de puntos
+ClosestPair closestUtil(Point points[], int n) {
+    if (n <= 3) {
+        ClosestPair closest = {__DBL_MAX__, {0, 0}, {0, 0}};
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                double distance = euclideanDistance(points[i], points[j]);
+                if (distance < closest.distance) {
+                    closest.distance = distance;
+                    closest.p1 = points[i];
+                    closest.p2 = points[j];
+                }
+            }
+        }
+        return closest;
+    }
+
+    // Ordenar puntos por coordenada x
+    qsort(points, n, sizeof(Point), compareX);
+
+    int mid = n / 2;
+    Point midPoint = points[mid];
+
+    // Recursivamente encontrar la distancia más corta en las mitades
+    ClosestPair dl = closestUtil(points, mid);
+    ClosestPair dr = closestUtil(points + mid, n - mid);
+
+    ClosestPair closest = (dl.distance < dr.distance) ? dl : dr;
+
+    // Crear el array strip[] que contiene puntos dentro de d de la línea vertical
+    Point strip[n];
+    int j = 0;
+    for (int i = 0; i < n; i++) {
+        if (fabs(points[i].x - midPoint.x) < closest.distance) {
+            strip[j] = points[i];
+            j++;
+        }
+    }
+
+    // Ordenar strip[] por coordenada y
+    qsort(strip, j, sizeof(Point), compareY);
+
+    // Encontrar la distancia más corta en el strip
+    for (int i = 0; i < j; i++) {
+        for (int k = i + 1; k < j && (strip[k].y - strip[i].y) < closest.distance; k++) {
+            double distance = euclideanDistance(strip[i], strip[k]);
+            if (distance < closest.distance) {
+                closest.distance = distance;
+                closest.p1 = strip[i];
+                closest.p2 = strip[k];
+            }
+        }
+    }
+
+    return closest;
+}
+
+// Función principal para ejecutar el algoritmo
+ClosestPair closestPoints(Point points[], int n) {
+    // Ordenar puntos inicialmente por coordenada x
+    qsort(points, n, sizeof(Point), compareX);
+    return closestUtil(points, n);
+}
+
+int main() {
+    srand(time(NULL)); // Inicializa la semilla aleatoria
+
+    int n_values[] = {10, 100, 1000, 10000, 100000};
+    int num_tests = sizeof(n_values) / sizeof(n_values[0]);
+
+    for (int k = 0; k < num_tests; k++) {
+        int n = n_values[k];
+        Point* points = (Point*)malloc(n * sizeof(Point));
+
+        // Genera puntos aleatorios
+        for (int i = 0; i < n; i++) {
+            points[i].x = (double)rand() / RAND_MAX * 200 - 100; // Genera números entre -100 y 100
+            points[i].y = (double)rand() / RAND_MAX * 200 - 100;
+        }
+
+        clock_t start = clock(); // Comienza a medir el tiempo
+        ClosestPair result = closestPoints(points, n);
+        clock_t end = clock(); // Finaliza la medición del tiempo
+
+        // Imprime resultados
+        printf("n = %d:\n", n);
+        printf("Puntos más cercanos: (%.6f, %.6f) y (%.6f, %.6f) con distancia = %.6f\n",
+               result.p1.x, result.p1.y, result.p2.x, result.p2.y, result.distance);
+        printf("Tiempo de ejecución: %.6f segundos\n\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+        free(points); // Libera la memoria asignada
+    }
+
+    return 0;
+}
