@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Definición de la estructura de nodo para una lista vinculada.
+struct ListNode {
+    int val;
+    struct ListNode *next;
+};
+
+// Función que crea un nuevo nodo.
+struct ListNode* createNode(int val) {
+    struct ListNode* newNode = (struct ListNode*)malloc(sizeof(struct ListNode));
+    newNode->val = val;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Función que crea una lista vinculada con `n` elementos aleatorios.
+struct ListNode* createRandomList(int n) {
+    if (n == 0) return NULL;
+    struct ListNode* head = createNode(rand() % 100); // Valores entre 0 y 99
+    struct ListNode* current = head;
+    
+    for (int i = 1; i < n; i++) {
+        current->next = createNode(current->val + (rand() % 10));  // Asegurar que la lista esté ordenada
+        current = current->next;
+    }
+    
+    return head;
+}
+
+// Función para fusionar dos listas ordenadas.
+struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2) {
+    if (!l1) return l2;
+    if (!l2) return l1;
+    
+    struct ListNode* result = NULL;
+    
+    if (l1->val < l2->val) {
+        result = l1;
+        result->next = mergeTwoLists(l1->next, l2);
+    } else {
+        result = l2;
+        result->next = mergeTwoLists(l1, l2->next);
+    }
+    
+    return result;
+}
+
+// Función para fusionar k listas vinculadas.
+struct ListNode* mergeKLists(struct ListNode** lists, int listsSize) {
+    if (listsSize == 0) return NULL;
+    if (listsSize == 1) return lists[0];
+    
+    // Fusionar en pares.
+    while (listsSize > 1) {
+        for (int i = 0; i < listsSize / 2; ++i) {
+            lists[i] = mergeTwoLists(lists[i], lists[listsSize - 1 - i]);
+        }
+        listsSize = (listsSize + 1) / 2;
+    }
+    
+    return lists[0];
+}
+
+// Función auxiliar para imprimir la lista vinculada.
+void printList(struct ListNode* head) {
+    while (head) {
+        printf("%d ", head->val);
+        head = head->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    srand(time(NULL)); // Inicializar semilla para números aleatorios
+    
+    int k = 3; // Número de listas aleatorias
+    struct ListNode* lists[k];
+    
+    // Crear listas aleatorias
+    for (int i = 0; i < k; i++) {
+        int listSize = rand() % 6 + 1;  // Tamaño aleatorio de cada lista (entre 1 y 6)
+        lists[i] = createRandomList(listSize);
+        printf("Lista %d: ", i + 1);
+        printList(lists[i]);
+    }
+    
+    // Fusionar las listas.
+    struct ListNode* result = mergeKLists(lists, k);
+    
+    // Imprimir la lista fusionada.
+    printf("Lista fusionada: ");
+    printList(result);
+    
+    return 0;
+}
