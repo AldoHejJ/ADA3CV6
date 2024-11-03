@@ -1,0 +1,45 @@
+#include <stdio.h>
+
+int maxArea(int* height, int heightSize) {
+    int max_area = 0;
+    int left = 0;
+    int right = heightSize - 1;
+
+    while (left < right) {
+        int minHeight = height[left] < height[right] ? height[left] : height[right];
+        int width = right - left;
+        int current_area = minHeight * width;
+        
+        // Actualizar el área máxima si la actual es mayor
+        if (current_area > max_area) {
+            max_area = current_area;
+        }
+        
+        // Mover el puntero de la línea más baja
+        if (height[left] < height[right]) {
+            left++;
+        } else {
+            right--;
+        }
+    }
+
+    return max_area;
+}
+
+int main() {
+    
+    int height1[] = {1, 8, 6, 2, 5, 4, 8, 3, 7};  // Ejemplo de arreglo
+    int n1 = sizeof(height1) / sizeof(height1[0]);
+    
+    int height2[] = {1, 1};  // Caso específico
+    int n2 = sizeof(height2) / sizeof(height2[0]);
+
+    int result1 = maxArea(height1, n1);
+   
+
+    printf("Input: height = [1,8,6,2,5,4,8,3,7] -> Salida: %d\n", result1);
+
+
+
+    return 0;
+}
