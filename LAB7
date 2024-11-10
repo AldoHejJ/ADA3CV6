@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <string.h>
+
+void comprimirCadena(const char *palabra, char *comprimido) {
+    int i = 0;
+    int longitud = strlen(palabra);
+    int indiceComp = 0;
+
+    while (i < longitud) {
+        char caracterActual = palabra[i];
+        int contador = 0;
+
+        // Contar las repeticiones del carácter actual, hasta un máximo de 9
+        while (i < longitud && palabra[i] == caracterActual && contador < 9) {
+            contador++;
+            i++;
+        }
+
+        // Agregar el contador y el carácter a la cadena comprimida
+        indiceComp += sprintf(&comprimido[indiceComp], "%d%c", contador, caracterActual);
+    }
+
+    // Terminar la cadena comprimida con el carácter nulo
+    comprimido[indiceComp] = '\0';
+}
+
+int main() {
+    char palabra[100];
+    char comprimido[200]; // Asignar suficiente espacio para la salida
+
+    printf("Ingresa una cadena para comprimir: ");
+    scanf("%s", palabra);
+
+    comprimirCadena(palabra, comprimido);
+    printf("Cadena comprimida: %s\n", comprimido);
+
+    return 0;
+}
