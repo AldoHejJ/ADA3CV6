@@ -1,0 +1,54 @@
+#include <stdio.h>
+
+// Función que cuenta los subarreglos de tamaño k con promedio mayor o igual al umbral
+int contarSubarreglos(int arr[], int n, int k, int threshold) {
+    int count = 0;
+    int sumaActual = 0;
+    int sumaMinima = k * threshold;
+
+    // Calcular la suma de los primeros k elementos
+    for (int i = 0; i < k; i++) {
+        sumaActual += arr[i];
+    }
+
+    // Verificar si el promedio del primer subarreglo cumple con la condición
+    if (sumaActual >= sumaMinima) {
+        count++;
+    }
+
+    // Usar una ventana deslizante para calcular la suma de los subarreglos restantes
+    for (int i = k; i < n; i++) {
+        sumaActual += arr[i] - arr[i - k];
+        if (sumaActual >= sumaMinima) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+int main() {
+    int n, k, threshold;
+
+    // Lectura del tamaño del arreglo y sus elementos
+    printf("Introduce el tamaño del arreglo: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Introduce los elementos del arreglo: \n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    // Lectura de k y threshold
+    printf("Introduce el valor de k: ");
+    scanf("%d", &k);
+    printf("Introduce el umbral (threshold): ");
+    scanf("%d", &threshold);
+
+    // Llamada a la función y mostrar el resultado
+    int resultado = contarSubarreglos(arr, n, k, threshold);
+    printf("El número de subarreglos de tamaño %d con promedio mayor o igual a %d es: %d\n", k, threshold, resultado);
+
+    return 0;
+}
